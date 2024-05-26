@@ -5,7 +5,6 @@ import userRoutes from './routes/user.routes.js';
 import bodyParser from 'body-parser';
 import connectDB from './config/mongo.js';
 import cors from 'cors';
-
 import express from 'express';
 const app = express();
 

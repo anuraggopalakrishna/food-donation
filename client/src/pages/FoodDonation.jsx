@@ -8,28 +8,37 @@ function FoodDonation() {
   const [quantity, setQuantity] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [address, setAddress] = useState("");
+  const [image, setImage] = useState(null);
 
   const email = localStorage.getItem("email");
   console.log(email);
 
+  const handleImageChange = (event) => {
+    setImage(event.target.files[0]);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = {
-      foodName,
-      foodTag,
-      quantity,
-      expiryDate,
-      address,
-      email,
-    };
-    console.log(formData);
-    // Send the form data to the server using fetch or Axios
+    const formData = new FormData();
+    formData.append("foodTag", foodTag);
+    formData.append("image", image);
+    formData.append("foodTag", foodTag);
+    formData.append("quantity", quantity);
+    formData.append("expiryDate", expiryDate);
+    formData.append("address", address);
+    formData.append("email", email);
+
+    console.log([...formData.entries()]); // For debugging
+
+    // Send the form data to the server using Axios
     try {
-      const response = await axios.post("http://localhost:3000/fooddonation", {
-        formData,
+      const response = await axios.post("http://localhost:3000/fooddonation", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", 
+        },
       });
 
-      console.log(response.data);
+      console.log("Response\n:", response.data);
       return response.data;
     } catch (error) {
       console.error(error);
@@ -97,11 +106,21 @@ function FoodDonation() {
           <div className="form_element">
             <label htmlFor="address">Address</label>
             <input
-              type="address"
+              type="text"
               id="address"
               name="address"
               value={address}
               onChange={(event) => setAddress(event.target.value)}
+            />
+          </div>
+          <div className="form_element">
+            <label htmlFor="image">Upload Image</label>
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              onChange={handleImageChange}
             />
           </div>
           <button id="foodDonation_submit-btn" type="submit">

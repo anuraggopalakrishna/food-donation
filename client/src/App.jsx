@@ -13,7 +13,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Layout from "./dashboard/Layout";
 import Navbar from "./components/Navbar/Navbar";
-import ImageUploader from "./pages/ImageUploader";
 import Profile from "./dashboard/Profile";
 import Food from "./dashboard/Food";
 
@@ -36,7 +35,6 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/predict" element={<ImageUploader />} />
         {token ? (
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<FoodDonation />} />

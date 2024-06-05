@@ -17,13 +17,11 @@ m = hub.KerasLayer(
 labelmap_url = "https://www.gstatic.com/aihub/tfhub/labelmaps/aiy_food_V1_labelmap.csv"
 input_shape = (224, 224)
 
- 
-@app.route("/predict",  methods=["POST"])
-@cross_origin()
+
+@app.route("/predict", methods=["POST"])
 def predict():
     if "image" not in request.files:
         return jsonify({"error": "No image sent."}), 400
-
     image_file = request.files["image"]
     image = np.asarray(io.imread(image_file), dtype="float")
     image = cv2.resize(image, dsize=input_shape, interpolation=cv2.INTER_CUBIC)
@@ -41,4 +39,4 @@ def predict():
 
 
 if __name__ == "__main__":
-    app.run(host='localhost', port=5000)
+    app.run(host="localhost", port=5000)

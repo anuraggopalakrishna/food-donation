@@ -6,37 +6,45 @@ import User from "../models/user.js";
 import fs from 'fs'
 
 const router = Router();
-const upload = multer({ dest: 'uploads/' });
+// const upload = multer({ dest: 'uploads/' });
+
+
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 router.post("/fooddonation", upload.single('image'), async (req, res) => {
     try {
-        const {foodTag,  quantity, expiryDate, address, email } = req.body;
+        const { foodName, foodTag, quantity, expiryDate, address, email } = req.body;
         const image = req.file;
 
+        // Find the user by email
         const user = await User.findOne({ email });
 
-        // Send the image to the prediction service
-        const formData = new FormData(); 
-        formData.append('image', fs.createReadStream(image.path));
-
-        const predictionResponse = await axios.post('http://localhost:5000/predict', formData, {
-            headers:
-            {"Content-Type": "multipart/form-data",}
-        });
-
-        foodName = predictionResponse.data.prediction;
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // Save the form data to the database
         const food = await Food.create({
-            foodName,
-            quantity,
-            expiryDate,
-            address,
-            foodTag,
+            foodName: foodName,
+            quantity: quantity,
+            expiryDate: expiryDate,
+            address: address,
+            foodTag: foodTag,
             user: user._id,
         });
 
         await food.save();
+
         user.food.push(food._id);
         await user.save();
 
@@ -47,4 +55,6 @@ router.post("/fooddonation", upload.single('image'), async (req, res) => {
     }
 });
 
-export default router;
+export default router
+
+

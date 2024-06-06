@@ -1,11 +1,52 @@
-import React from "react";
-import { FaCalendarAlt, FaCartArrowDown, FaHome } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaCalendarAlt, FaCartArrowDown, FaHome, FaHourglassEnd } from "react-icons/fa";
+import axios from "axios";
+import Modal from "react-modal";
 import "./FoodCard.css";
 
-const FoodCard = ({ name, quantity, date, address, tag }) => {
+Modal.setAppElement("#root");
+
+const FoodCard = ({ id, name, quantity, date, address, tag }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [nameOfUser, setNameOfUser] = useState("");
+  const handleCheckStatus = () => {
+    setShowDetails(!showDetails);
+  };
+
+  const handleClaim = async () => {
+    const confirmClaim = window.confirm("Do you want to claim this food?");
+    if (confirmClaim) {
+      try {
+        // Fetch user details
+        const userEmail = localStorage.getItem("email");
+        const response = await axios.get(`http://localhost:3000/user/${userEmail}`);
+
+        setPhoneNumber(response.data.number);
+        setEmail(response.data.email);
+        setNameOfUser(response.data.name);
+        setShowModal(true);
+      } catch (error) {
+        console.log("Error claiming the food:", error.message);
+      }
+    }
+  };
+
+  const handleConfirmClaim = async () => {
+    try {
+      // Remove the food item from the database
+      await axios.delete(`http://localhost:3000/foods/${id}`);
+      setShowModal(false);
+    } catch (error) {
+      console.log("Error removing the food item:", error.message);
+    }
+  };
+
   return (
     <div>
-      <div class="card">
+      <div className="card">
         <p
           style={{
             position: "absolute",
@@ -26,7 +67,7 @@ const FoodCard = ({ name, quantity, date, address, tag }) => {
           src={`https://source.unsplash.com/random/?${name}`}
           alt="Card Image"
         />
-        <div class="card-content">
+        <div className="card-content">
           <h2 className="food-title">{name}</h2>
           <div className="food-details">
             <ul className="icons">
@@ -38,9 +79,9 @@ const FoodCard = ({ name, quantity, date, address, tag }) => {
               </li>
               <li>
                 <span className="icons-name">
-                  <FaCalendarAlt />
+                  <FaHourglassEnd />
                 </span>
-                : {date}
+                : { new Date(date).toLocaleString() }
               </li>
               <li>
                 <span className="icons-name">
@@ -50,9 +91,37 @@ const FoodCard = ({ name, quantity, date, address, tag }) => {
               </li>
             </ul>
           </div>
-          <button className="food-btn">Check Status</button>
+          <button className="food-btn" onClick={handleCheckStatus}>
+            Check Status
+          </button>
+          {showDetails && (
+            <div className="food-details-card">
+              <h3>Details:</h3>
+              <p>Name: {name}</p>
+              <p>Quantity: {quantity} kg</p>
+              <p>Expiry Date: {new Date(date).toLocaleString()}</p>
+              <p>Address: {address}</p>
+              <button className="food-claim-btn" onClick={handleClaim}>
+                Claim
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      <Modal isOpen={showModal} onRequestClose={() => setShowModal(false)} className="Modal" overlayClassName="Overlay">
+        <h2>Contact Information</h2>
+        <br />
+        <p>Name: {nameOfUser}</p>
+        <p>Email: {email}</p>
+        <p>Phone Number: {phoneNumber}</p>
+        <br />
+        <p>Please note down this information. The listing will be removed once you confirm the claim.</p>
+        <div className="modal-buttons">
+          <button className="confirm-btn" onClick={handleConfirmClaim}>Confirm Claim</button>
+          <button className="cancel-btn" onClick={() => setShowModal(false)}>Cancel</button>
+        </div>
+      </Modal>
     </div>
   );
 };

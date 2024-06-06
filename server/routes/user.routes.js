@@ -10,6 +10,19 @@ router.get('/:userId', (req, res) => {
         .catch((err) => res.status(400).json('Error: ' + err));
 });
 
+router.get("/user/:email", async (req, res) => {
+    try {
+        console.log(req.params.email);
+        const user = await User.findOne({ email: req.params.email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.put("/update", async (req, res) => {
     const { id, name, number, email } = req.body;
 

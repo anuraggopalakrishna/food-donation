@@ -21,6 +21,19 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+router.delete("/foods/:id", async (req, res) => {
+    try {
+        const food = await Food.findByIdAndDelete(req.params.id);
+        if (!food) {
+            return res.status(404).json({ message: "Food not found" });
+        }
+        res.json({ message: "Food item removed" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 router.post("/fooddonation", upload.single('image'), async (req, res) => {
     try {
         const { foodName, foodTag, quantity, expiryDate, address, email } = req.body;

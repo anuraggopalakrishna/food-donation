@@ -79,7 +79,7 @@ const Food = () => {
       >
         {filteredFood.map((item) => (
           <FoodCard
-            key={item._id}
+            id={item._id}
             name={item.foodName}
             quantity={item.quantity}
             date={item.expiryDate}

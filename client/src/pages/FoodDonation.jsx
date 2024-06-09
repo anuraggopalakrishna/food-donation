@@ -12,6 +12,9 @@ function FoodDonation() {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [prediction, setPrediction] = useState(null);
+
+  const [accuracy, setAccuracy] = useState(null);
+
   const [step, setStep] = useState(1);
 
   const navigate = useNavigate();
@@ -52,6 +55,9 @@ function FoodDonation() {
 
       setPrediction(response.data.prediction);
       setFoodName(response.data.prediction);
+      
+      setAccuracy(response.data.accuracy);
+
       setStep(2);
     } catch (error) {
       console.error("Error predicting:", error);
@@ -126,6 +132,8 @@ function FoodDonation() {
             <div className="prediction_result">
               <h2>Prediction:</h2>
               <p>{prediction}</p>
+              <h2>Accuracy:</h2>
+              <p>{accuracy}%</p>
               <button type="button" onClick={() => setStep(3)}>Yes</button>
               <button type="button" onClick={handleRetry}>No</button>
             </div>

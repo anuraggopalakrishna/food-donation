@@ -32,10 +32,16 @@ def predict():
     # This assumes you're using TF2.
     output = m(images)
     predicted_index = output.numpy().argmax()
+
+    accuracy=output.numpy()[0][predicted_index]*100
+    accuracy = round(accuracy,2)
+
+    print(accuracy)
+
     classes = list(pd.read_csv(labelmap_url)["name"])
     prediction = classes[predicted_index]
 
-    return jsonify({"prediction": prediction}), 200
+    return jsonify({"prediction": prediction, "accuracy": accuracy}), 200
 
 
 if __name__ == "__main__":
